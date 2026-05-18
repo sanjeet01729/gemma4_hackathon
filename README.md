@@ -1,97 +1,218 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# PadhAi 📚
 
-# Getting Started
+An offline-first AI-powered doubt solver built for government exam aspirants in low-connectivity regions of Bihar and beyond. Powered by **Gemma 4 E2B** via Ollama, PadhAi lets students ask questions by text or photograph a page from their textbook and get clear, exam-focused answers in **Hindi or English** — no internet required during use.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+> Built for the **Gemma 4 Impact Challenge** by Sanjeet Kumar.
 
-## Step 1: Start Metro
+---
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+## The Problem
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+Millions of students across Bihar prepare for BPSC, SSC, Railway, and UPSC exams from villages where mobile connectivity is near-zero. They rely on printed books and downloaded videos. When they hit a doubt at 11 PM, there is no one to ask. PadhAi is that patient tutor — always available, always free.
 
-```sh
-# Using npm
+---
+
+## Features
+
+- **Text-based doubt clearing** — ask any GK, History, Polity, Maths, or Science question
+- **Vision / image input** — photograph a textbook page or question paper and get an explanation
+- **Hindi + English support** — responds in the language you ask in
+- **Offline after setup** — no internet needed once the model is running
+- **Practice screen** — self-test mode for exam preparation
+- **Language selection** — choose your preferred interaction language on first launch
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Mobile app | React Native CLI (Android) |
+| API client | TypeScript (`src/api/gemma.ts`) |
+| State management | Zustand (`src/store/useAppStore.ts`) |
+| Backend | FastAPI on Google Colab |
+| Tunneling | ngrok (two tunnels: Mac → Colab → App) |
+| Inference | Ollama running locally on MacBook |
+| Model | Gemma 4 E2B (multimodal, multilingual) |
+
+---
+
+## Project Structure
+
+```text
+src/
+├── api/
+│   └── gemma.ts                    # API calls to FastAPI (text + vision)
+├── screens/
+│   ├── SplashScreen.tsx            # Launch screen
+│   ├── LanguageSelectScreen.tsx    # Hindi / English selection
+│   ├── HomeScreen.tsx              # Main entry point
+│   ├── ChatScreen.tsx              # Text and image Q&A interface
+│   └── PracticeScreen.tsx          # Self-practice / quiz mode
+└── store/
+    └── useAppStore.ts              # Global state via Zustand
+```
+
+---
+
+## Architecture
+
+```text
+┌─────────────────────────────────────┐
+│        React Native App             │
+│           (Android)                 │
+│  text input · camera · gallery      │
+└──────────────┬──────────────────────┘
+               │
+               │ ngrok tunnel #2
+               │ (HTTP · JSON)
+               │
+┌──────────────▼──────────────────────┐
+│     FastAPI Server · Google Colab   │
+│  POST /ask · POST /ask-vision       │
+└──────────────┬──────────────────────┘
+               │
+               │ ngrok tunnel #1
+               │ (REST · localhost)
+               │
+┌──────────────▼──────────────────────┐
+│      Ollama · MacBook               │
+│   inference server · port 11434     │
+└──────────────┬──────────────────────┘
+               │
+┌──────────────▼──────────────────────┐
+│         Gemma 4 E2B                 │
+│   text + vision · Hindi + English   │
+└─────────────────────────────────────┘
+```
+
+## Getting Started
+
+
+
+---
+
+## Google Colab Backend
+
+The FastAPI backend used for text and vision inference can also run directly from Google Colab.  
+This was used during development and testing to expose the API publicly through ngrok while keeping Ollama running locally on a MacBook.
+
+### Colab Notebook
+
+:contentReference[oaicite:0]{index=0}
+
+### What the notebook does
+
+- Installs FastAPI, Uvicorn, pyngrok, and required dependencies
+- Starts a FastAPI server inside Colab
+- Creates public ngrok endpoints for the API
+- Forwards requests from the React Native app to Ollama
+- Supports both:
+  - `POST /ask` → text questions
+  - `POST /ask-vision` → image-based questions
+
+### Request Flow
+
+```text
+React Native App
+        ↓
+FastAPI on Google Colab
+        ↓
+ngrok tunnel
+        ↓
+Local Ollama Server (MacBook)
+        ↓
+Gemma 4 E2B
+```
+
+This setup allowed rapid prototyping without deploying a dedicated cloud backend.
+### Prerequisites for react native cli
+
+- Node.js ≥ 18
+- React Native CLI environment set up — see the [official guide](https://reactnative.dev/docs/set-up-your-environment)
+- Android device or emulator
+- Ollama installed on your machine with Gemma 4 E2B pulled
+- Python 3.10+ for the FastAPI server
+- ngrok account (free tier works)
+
+### 1. Clone the repo
+
+```bash
+git clone https://github.com/your-username/PadhAi.git
+cd PadhAi
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Start the FastAPI server
+
+```bash
+cd server
+pip install fastapi uvicorn requests
+uvicorn main:app --host 0.0.0.0 --port 8000
+```
+
+### 4. Start ngrok tunnels
+
+```bash
+# Tunnel 1: expose Ollama on Mac
+ngrok http 11434
+
+# Tunnel 2: expose FastAPI on Colab (or locally)
+ngrok http 8000
+```
+
+Update the base URL in `src/api/gemma.ts` with your ngrok URL.
+
+### 5. Pull the model via Ollama
+
+```bash
+ollama pull gemma4:e2b
+ollama serve
+```
+
+### 6. Start Metro and run the app
+
+```bash
+# Start Metro
 npm start
 
-# OR using Yarn
-yarn start
-```
-
-## Step 2: Build and run your app
-
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
-
-```sh
-# Using npm
+# Run on Android (new terminal)
 npm run android
-
-# OR using Yarn
-yarn android
 ```
 
-### iOS
+---
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+## Screens
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+| Screen | Description |
+|---|---|
+| Splash | App launch animation |
+| Language Select | Choose Hindi or English |
+| Home | Navigation hub |
+| Chat | Text and image doubt-clearing |
+| Practice | Self-test mode for exam prep |
 
-```sh
-bundle install
-```
+---
 
-Then, and every time you update your native dependencies, run:
+## Roadmap
 
-```sh
-bundle exec pod install
-```
+- [ ] Fine-tune E2B on Bihar exam question banks (BPSC, SSC PYQs)
+- [ ] Voice input and output for low-literacy users
+- [ ] Fully offline APK with on-device inference (llama.cpp via JNI)
+- [ ] Maithili, Bhojpuri, and Magahi language support
+- [ ] Cached response history for offline review
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+---
 
-```sh
-# Using npm
-npm run ios
+## License
 
-# OR using Yarn
-yarn ios
-```
+MIT
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+---
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
-
-## Step 3: Modify your app
-
-Now that you have successfully run the app, let's make changes!
-
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
-
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+*If it works for a student in Madhubani, it will work for a student in Gaza.*

@@ -201,7 +201,7 @@ npm run android
 
 ## Roadmap
 
-- [ ] Fine-tune E2B on Bihar exam question banks (BPSC, SSC PYQs)
+- [ ] Improve prompts for Bihar-focused competitive exam preparation
 - [ ] Voice input and output for low-literacy users
 - [ ] Fully offline APK with on-device inference (llama.cpp via JNI)
 - [ ] Maithili, Bhojpuri, and Magahi language support

@@ -42,7 +42,7 @@ interface Message {
   role: Role;
   text: string;
   timestamp: Date;
-  imageUri?: string; // ← for showing image in bubble
+  imageUri?: string; 
 }
 
 // ── Colors ───────────────────────────────────────────────────────────────────
@@ -62,7 +62,7 @@ const C = {
   aiBubble: "rgba(255,255,255,0.055)",
 };
 
-// ── Suggested questions ──────────────────────────────────────────────────────
+
 const SUGGESTIONS: Record<
   string,
   {
@@ -227,7 +227,6 @@ const orb = StyleSheet.create({
   icon: { fontSize: 13, color: C.gold },
 });
 
-// ── Typing dots ───────────────────────────────────────────────────────────────
 function TypingDots() {
   const d1 = useRef(new Animated.Value(0.25)).current;
   const d2 = useRef(new Animated.Value(0.25)).current;
@@ -272,7 +271,6 @@ function TypingDots() {
   );
 }
 
-// ── Message bubble ────────────────────────────────────────────────────────────
 function MessageBubble({ message }: { message: Message }) {
   const fade = useRef(new Animated.Value(0)).current;
   const slide = useRef(new Animated.Value(10)).current;

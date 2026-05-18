@@ -42,7 +42,7 @@ const HEADERS = {
   "ngrok-skip-browser-warning": "true",
 };
 
-// ── Subject chips ─────────────────────────────────────────────────────────────
+
 const SUBJECT_CHIPS = [
   { id: "history", hindi: "इतिहास", english: "History" },
   { id: "geography", hindi: "भूगोल", english: "Geography" },
@@ -53,7 +53,7 @@ const SUBJECT_CHIPS = [
   { id: "economy", hindi: "अर्थशास्त्र", english: "Economy" },
 ];
 
-// ── Fallback questions if backend fails ───────────────────────────────────────
+
 const FALLBACK: Record<string, Question[]> = {
   history: [
     {
@@ -132,7 +132,6 @@ const FALLBACK: Record<string, Question[]> = {
   ],
 };
 
-// ── Score card ────────────────────────────────────────────────────────────────
 function ScoreCard({
   score,
   total,
@@ -240,7 +239,6 @@ const sc = StyleSheet.create({
   secondaryBtnText: { fontSize: 14, color: "rgba(255,255,255,0.4)" },
 });
 
-// ── Main screen ───────────────────────────────────────────────────────────────
 export default function PracticeScreen({ navigation, route }: Props) {
   const { subjectId } = route.params;
   const { language, setLanguage } = useAppStore();
@@ -269,7 +267,6 @@ export default function PracticeScreen({ navigation, route }: Props) {
     fetchQuestions(subjectId, language);
   }, []);
 
-  // Refetch when language changes
   useEffect(() => {
     fetchQuestions(activeSubject, language);
   }, [language]);

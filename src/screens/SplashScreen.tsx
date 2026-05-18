@@ -81,7 +81,6 @@ const SplashScreen = ({ navigation }: Props) => {
       }),
     ]).start();
 
-    // Loading bar fill (separate — width can't use native driver)
     setTimeout(() => {
       Animated.timing(barWidth, {
         toValue: 1,
